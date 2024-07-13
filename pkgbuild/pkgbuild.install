@@ -8,19 +8,19 @@ post_install() {
     docker pull vagrantlibvirt/vagrant-libvirt:latest
     for user in $(awk -F':' '{ if ($3 >= 1000 && $1 != "nobody") print $1 }' /etc/passwd); do
       if [ -z "$(grep 'vagrant()' /home/$user/.bashrc)" ];then
-        echo '
-        vagrant(){
-          docker run -it --rm \
-            -e LIBVIRT_DEFAULT_URI \
-            -v /var/run/libvirt/:/var/run/libvirt/ \
-            -v ~/.vagrant.d:/.vagrant.d \
-            -v $(realpath "${PWD}"):${PWD} \
-            -w "${PWD}" \
-            --network host \
-            vagrantlibvirt/vagrant-libvirt:latest \
-              vagrant $@
-        }
-        ' | tee -a /home/$user/.bashrc
+echo '
+vagrant(){
+  docker run -it --rm \
+    -e LIBVIRT_DEFAULT_URI \
+    -v /var/run/libvirt/:/var/run/libvirt/ \
+    -v ~/.vagrant.d:/.vagrant.d \
+    -v $(realpath "${PWD}"):${PWD} \
+    -w "${PWD}" \
+    --network host \
+    vagrantlibvirt/vagrant-libvirt:latest \
+    vagrant $@
+}
+' | tee -a /home/$user/.bashrc >> /dev/null
       fi
     done
 }
